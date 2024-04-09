@@ -1,7 +1,8 @@
 /********************************************************************************
- * base.c: A header file that provides base functionality to C programs.
+ * str.c: A header file that provides string manipulation function to C programs.
  * Code samples & inspiration taken from:
  *  - https://github.com/gingerBill/gb/blob/master/gb.h by Ginger Bill
+ *  - https://github.com/gingerBill/gb/blob/master/gb_string.h by Ginger Bill
  * -----------------------------------------------------------------------------
  * MIT License
  *
@@ -27,35 +28,40 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ********************************************************************************/
 
-#ifndef LIBS_BASE
-#define LIBS_BASE
 
-#define SYSCALL_EXIT 60
-#define SYSCALL_WRITE 1
+#ifndef LIBS_STR
+#define LIBS_STR
 
-extern unsigned int _strlen(const char *str);
+#include <assert.h>
 
-void base_print(const char *str) {
-    asm (
-        "syscall"
-        :
-        : "a"(SYSCALL_WRITE), "D"(1), "S"(str), "d"(_strlen(str))
-        : "rcx", "r11", "memory"
-    );
+int str_cmp(char const *s1, char const *s2) {
+	while (*s1 && (*s1 == *s2)) {
+		s1++, s2++;
+	}
+	return *(unsigned char *)s1 - *(unsigned char *)s2;
 }
 
-void base_println(const char *str) {
+char *str_cpy(char *dest, char const *source) {
+	assert(dest);
+	if (source) {
+		char *str = dest;
+		while (*source) *str++ = *source++;
+	}
+	return dest;
 }
 
-unsigned int _strlen(const char *str)
+unsigned int str_len(const char *str)
 {
+    unsigned int i = 0;
     const char *start = str;
 
     while(*str!='\0')
     {
+        i++;
         str++;
     }
 
     return str - start;
 }
-#endif // LIBS_BASE
+
+#endif // LIBS_STR

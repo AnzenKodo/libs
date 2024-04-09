@@ -3,7 +3,7 @@
  * Taken inspiration from
  *  - https://github.com/tsoding/arena by Alexey Kutepov
  *  - https://github.com/CobbCoding1/c-allocators by CobbCoding
- * --------------------------------------------------------------------------------
+ * -----------------------------------------------------------------------------
  * MIT License
  *
  * Copyright 2024 AnzenKodo
@@ -28,6 +28,9 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ********************************************************************************/
 
+#ifndef LIBS_ARENA
+#define LIBS_ARENA
+
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -50,7 +53,7 @@ void *arena_alloc(Arena *arena, size_t size) {
     assert(arena->capacity >= size);
 
     Arena *current = arena;
-    while(!(current->size + size < current->capacity)) {
+    while (!(current->size + size < current->capacity)) {
         if (current->next == NULL) {
             Arena *next = malloc(sizeof(Arena));
             next->capacity = arena->capacity;
@@ -81,7 +84,7 @@ void *arena_realloc(Arena *arena, void *old_ptr, size_t old_size, size_t new_siz
     return new_ptr;
 }
 
-void *arena_reset(Arena *arena) {
+void arena_reset(Arena *arena) {
     Arena *current = arena;
 
     while (current != NULL) {
@@ -90,7 +93,7 @@ void *arena_reset(Arena *arena) {
     }
 }
 
-void *arena_free(Arena *arena) {
+void arena_free(Arena *arena) {
     free(arena->data);
     arena->capacity = 0;
     arena->size = 0;
@@ -105,3 +108,4 @@ void *arena_free(Arena *arena) {
 
     arena->next = NULL;
 }
+#endif // LIBS_ARENA

@@ -45,8 +45,8 @@
 #	include <stdarg.h>
 #endif // _MSC_VER
 
-#define PROJECT_TITLE "nn"
-#define MAIN_FILE "main.c"
+#define PROJECT_TITLE "example"
+#define MAIN_FILE "examples.c"
 #define BUILD_DIR "build"
 
 const char *HELP_MESSAGE = "build.c: A C file that build's C files\n"
@@ -87,7 +87,7 @@ void build_proj_compile(char *cmd) {
 	// build_cmd_append(cmd, " -Iincludes");							  // Includes
 	build_cmd_append(cmd, " -o "BUILD_DIR"/"PROJECT_TITLE); 	  // Object file
 	build_cmd_append(cmd, " -g3");									  // Debug
-	build_cmd_append(cmd, " -Wall");							      // Warning
+	build_cmd_append(cmd, " -Wall -Wextra");							      // Warning
 	// Security
 	// build_cmd_append(cmd, " -GS -EHa /guard:cf -sdl -Qspectre -fsanitize=address");
 	build_cmd_finish(cmd);
@@ -110,6 +110,7 @@ void build_proj_run(char *cmd) {
 }
 
 int main(int argc, char *argv[]) {
+    (void)argc;
 	char *args = argv[1];
 
 	build_dir_make(BUILD_DIR);
