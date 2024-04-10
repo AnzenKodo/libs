@@ -47,7 +47,7 @@ size_t hash_str(const char *s) {
     return key & 0x7FFFFFFF;
 }
 
-size_t hash_str_stb(char *str, size_t seed) {
+size_t hash_stb(char *str, size_t seed) {
   size_t hash = seed;
   while (*str)
      hash = HASH_ROTATE_LEFT(hash, 9) + (unsigned char) *str++;
@@ -63,7 +63,7 @@ size_t hash_str_stb(char *str, size_t seed) {
   return hash+seed;
 }
 
-unsigned long hash_str_djb2(unsigned char *str) {
+unsigned long hash_djb2(unsigned char *str) {
     unsigned long hash = 5381;
     int c;
     while ((c = *str++)) {
@@ -72,7 +72,7 @@ unsigned long hash_str_djb2(unsigned char *str) {
     return hash;
 }
 
-static unsigned long hash_str_sdbm(str)
+static unsigned long hash_sdbm(str)
 unsigned char *str;
 {
     unsigned long hash = 0;
@@ -82,7 +82,7 @@ unsigned char *str;
     return hash;
 }
 
-unsigned long hash_str_2lose(unsigned char *str) {
+unsigned long hash_2lose(unsigned char *str) {
 	unsigned int hash = 0;
 	int c;
 
@@ -90,6 +90,52 @@ unsigned long hash_str_2lose(unsigned char *str) {
 	    hash += c;
 
 	return hash;
+}
+
+unsigned int hash_adler32(const char* s)
+{
+    unsigned int a = 1;
+    unsigned int b = 0;
+    const unsigned int MODADLER = 65521;
+
+    size_t i = 0;
+    while (s[i] != '\0')
+    {
+        a = (a + s[i]) % MODADLER;
+        b = (b + a) % MODADLER;
+        i++;
+    }
+    return (b << 16) | a;
+}
+
+unsigned int hash_crc32(const char* s)
+{
+    unsigned int crc = 0xffffffff;
+    size_t i = 0;
+    while (s[i] != '\0')
+    {
+        unsigned char byte = s[i];
+        crc = crc ^ byte;
+        for (unsigned char j = 8; j > 0; --j)
+        {
+            crc = (crc >> 1) ^ (0xEDB88320 & (-(crc & 1)));
+        }
+
+        i++;
+    }
+    return crc ^ 0xffffffff;
+}
+
+unsigned char xor8(const char* s)
+{
+    unsigned char hash = 0;
+    size_t i = 0;
+    while (s[i] != '\0')
+    {
+        hash = (hash + s[i]) & 0xff;
+        i++;
+    }
+    return (((hash ^ 0xff) + 1) & 0xff);
 }
 
 unsigned int hash_int_jenkins(unsigned int a) {
