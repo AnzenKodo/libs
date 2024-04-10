@@ -47,6 +47,11 @@ void base_print(const char *str) {
 void base_println(const char *str) {
 }
 
+unsigned int base_rand(unsigned int Index) {
+	Index = (Index << 13) ^ Index;
+	return ((Index * (Index * Index * 15731 + 789221) + 1376312589) & 0x7fffffff);
+}
+
 unsigned int _strlen(const char *str)
 {
     const char *start = str;

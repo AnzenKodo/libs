@@ -1,9 +1,8 @@
 /********************************************************************************
- * str.c: A header file that provides string manipulation function to C programs.
+ * math.c: C math library
  * Code samples & inspiration taken from:
- *  - https://github.com/gingerBill/gb/blob/master/gb.h by Ginger Bill
- *  - https://github.com/gingerBill/gb/blob/master/gb_string.h by Ginger Bill
- *  - https://github.com/ennorehling/clibs/blob/master/strings.c by Enno Rehling
+ *  - https://www.youtube.com/watch?v=443UNeGrFoM by Eskil Steenberg
+ *  - https://github.com/gingerBill/gb/blob/master/gb_math.h by Ginger Bill
  * -----------------------------------------------------------------------------
  * MIT License
  *
@@ -29,40 +28,16 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ********************************************************************************/
 
-
-#ifndef LIBS_STR
-#define LIBS_STR
-
-#include <assert.h>
-
-int str_cmp(char const *s1, char const *s2) {
-	while (*s1 && (*s1 == *s2)) {
-		s1++, s2++;
-	}
-	return *(unsigned char *)s1 - *(unsigned char *)s2;
-}
-
-char *str_cpy(char *dest, char const *source) {
-	assert(dest);
-	if (source) {
-		char *str = dest;
-		while (*source) *str++ = *source++;
-	}
-	return dest;
-}
-
-unsigned int str_len(const char *str)
+float math_sqrt(float number)
 {
-    unsigned int i = 0;
-    const char *start = str;
-
-    while(*str!='\0')
-    {
-        i++;
-        str++;
-    }
-
-    return str - start;
+	int i;
+	float x, y;
+	x = number * 0.5;
+	y = number;
+	i = * (int *) &y;
+	i = 0x5f3759df - (i >> 1);
+	y = *(float *) &i;
+	y = y * (1.5 - (x * y * y));
+	y = y * (1.5 - (x * y * y));
+	return number * y;
 }
-
-#endif // LIBS_STR
