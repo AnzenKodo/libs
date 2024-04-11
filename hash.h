@@ -2,7 +2,10 @@
  * hash.c: Provides different hash function
  * Code samples & inspiration taken from:
  *  - https://github.com/nothings/stb/blob/master/stb_ds.h by Sean Barrett
+ *  - https://web.archive.org/web/20071102041545/http://www.concentric.net/~Ttwang/tech/inthash.htm
+        by Thomas Wang
  *  - http://www.cse.yorku.ca/~oz/hash.html
+ *  - https://burtleburtle.net/bob/hash/integer.html
  * -----------------------------------------------------------------------------
  * MIT License
  *
@@ -38,21 +41,11 @@
 #define HASH_ROTATE_LEFT(val, n)   (((val) << (n)) | ((val) >> (HASH_SIZE_T_BITS - (n))))
 #define HASH_ROTATE_RIGHT(val, n)  (((val) >> (n)) | ((val) << (HASH_SIZE_T_BITS - (n))))
 
-size_t hash_str(const char *s) {
-    size_t key = 0;
-    assert(s);
-    while (*s) {
-        key = key * 37 + *s++;
-    }
-    return key & 0x7FFFFFFF;
-}
-
-size_t hash_stb(char *str, size_t seed) {
+size_t hash_stb6432shift(char *str, size_t seed) {
   size_t hash = seed;
   while (*str)
      hash = HASH_ROTATE_LEFT(hash, 9) + (unsigned char) *str++;
 
-  // Thomas Wang 64-to-32 bit mix function, hopefully also works in 32 bits
   hash ^= seed;
   hash = (~hash) + (hash << 18);
   hash ^= hash ^ HASH_ROTATE_RIGHT(hash,31);
@@ -63,7 +56,16 @@ size_t hash_stb(char *str, size_t seed) {
   return hash+seed;
 }
 
-unsigned long hash_djb2(unsigned char *str) {
+unsigned long hash_djbx33a(const char *s) {
+    unsigned long key = 0;
+    assert(s);
+    while (*s) {
+        key = key * 37 + *s++;
+    }
+    return key & 0x7FFFFFFF;
+}
+
+unsigned long hash_djb2(char *str) {
     unsigned long hash = 5381;
     int c;
     while ((c = *str++)) {
@@ -82,7 +84,7 @@ unsigned char *str;
     return hash;
 }
 
-unsigned long hash_2lose(unsigned char *str) {
+unsigned long hash_2lose(char *str) {
 	unsigned int hash = 0;
 	int c;
 
@@ -92,7 +94,7 @@ unsigned long hash_2lose(unsigned char *str) {
 	return hash;
 }
 
-unsigned int hash_adler32(const char* s)
+unsigned int hash_adler32(char* s)
 {
     unsigned int a = 1;
     unsigned int b = 0;
@@ -108,7 +110,7 @@ unsigned int hash_adler32(const char* s)
     return (b << 16) | a;
 }
 
-unsigned int hash_crc32(const char* s)
+unsigned int hash_crc32(char* s)
 {
     unsigned int crc = 0xffffffff;
     size_t i = 0;
@@ -126,7 +128,7 @@ unsigned int hash_crc32(const char* s)
     return crc ^ 0xffffffff;
 }
 
-unsigned char xor8(const char* s)
+unsigned char hash_xor8(char* s)
 {
     unsigned char hash = 0;
     size_t i = 0;
@@ -136,6 +138,20 @@ unsigned char xor8(const char* s)
         i++;
     }
     return (((hash ^ 0xff) + 1) & 0xff);
+}
+
+unsigned int hash_int_mix(unsigned int a, unsigned int b, unsigned int c)
+{
+  a=a-b;  a=a-c;  a=a^(c >> 13);
+  b=b-c;  b=b-a;  b=b^(a << 8);
+  c=c-a;  c=c-b;  c=c^(b >> 13);
+  a=a-b;  a=a-c;  a=a^(c >> 12);
+  b=b-c;  b=b-a;  b=b^(a << 16);
+  c=c-a;  c=c-b;  c=c^(b >> 5);
+  a=a-b;  a=a-c;  a=a^(c >> 3);
+  b=b-c;  b=b-a;  b=b^(a << 10);
+  c=c-a;  c=c-b;  c=c^(b >> 15);
+  return c;
 }
 
 unsigned int hash_int_jenkins(unsigned int a) {
@@ -148,7 +164,7 @@ unsigned int hash_int_jenkins(unsigned int a) {
     return a;
 }
 
-unsigned int hash_int_wang(unsigned int a) {
+unsigned int hash_int_wang32shift(unsigned int a) {
     a = ~a + (a << 15);           /*  a = (a << 15) - a - 1; */
     a = a ^ (a >> 12);
     a = a + (a << 2);
@@ -156,6 +172,36 @@ unsigned int hash_int_wang(unsigned int a) {
     a = a * 2057;                 /*  a = (a + (a << 3)) + (a << 11); */
     a = a ^ (a >> 16);
     return a;
+}
+
+unsigned int hash_int_wang32shiftmult(unsigned int key) {
+    key = (key ^ 61) ^ (key >> 16);
+    key = key + (key << 3);
+    key = key ^ (key >> 4);
+    key = key * 0x27d4eb2d;
+    key = key ^ (key >> 15);
+    return key;
+}
+
+unsigned int hash_int_wang6432shift(long unsigned int key) {
+  key = (~key) + (key << 18); // key = (key << 18) - key - 1;
+  key = key ^ (key >> 31);
+  key = key * 21; // key = (key + (key << 2)) + (key << 4);
+  key = key ^ (key >> 11);
+  key = key + (key << 6);
+  key = key ^ (key >> 22);
+  return (unsigned int) key;
+}
+
+long unsigned int hash_int_wang64shift(long unsigned int key) {
+  key = (~key) + (key << 21); // key = (key << 21) - key - 1;
+  key = key ^ (key >> 24);
+  key = (key + (key << 3)) + (key << 8); // key * 265
+  key = key ^ (key >> 14);
+  key = (key + (key << 2)) + (key << 4); // key * 21
+  key = key ^ (key >> 28);
+  key = key + (key << 31);
+  return key;
 }
 
 #endif // LIBS_HASH
