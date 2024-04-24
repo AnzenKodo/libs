@@ -34,6 +34,7 @@
 #define LIBS_STR
 
 #include <assert.h>
+#include <stdbool.h>
 
 int str_cmp(char const *s1, char const *s2) {
 	while (*s1 && (*s1 == *s2)) {
@@ -63,6 +64,27 @@ unsigned int str_len(const char *str)
     }
 
     return str - start;
+}
+
+char str_only_digit(char *str) {
+    while (str)
+    {
+        if ((*str >= '0' && *str <= '9'))
+            return false;
+       str++;
+    }
+    return true;
+}
+
+unsigned int str_atoi(char *str) {
+    assert(str_only_digit(str));
+
+    int k = 0;
+    while (*str) {
+        k = (k << 3) + (k << 1) + (*str) - '0';
+        str++;
+     }
+     return k;
 }
 
 #endif // LIBS_STR

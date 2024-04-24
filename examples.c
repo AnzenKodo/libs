@@ -2,6 +2,7 @@
 #include "hash.h"
 #include "str.h"
 #include "base.h"
+#include "args.h"
 
 void arena_test(void) {
     Arena arena = {0};
@@ -54,7 +55,23 @@ void ht_test(void) {
     assert(hash_int_wang64shift(num_mix) == 5360857491066763507);
 }
 
-int main(void) {
-    // arena_test();
-    // ht_test();
+void args_test(int argc, char **argv) {
+    args_init(argc, argv);
+    args_get("--name", "-n", "Name of person");
+    args_get_int("--age", "-a", "Age of person");
+    args_get_int("--weight", "-w", "Weight of person");
+    if (args_has("--help", "-h", "Show help")) {
+        args_print_help(
+            "example.c",
+            "Examples of AK Libs.",
+            "[options] [value]",
+            "SPDX-License-Identifier: MIT (https://spdx.org/licenses/MIT)"
+        );
+    }
+}
+
+int main(int argc, char *argv[]) {
+    arena_test();
+    ht_test();
+    args_test(argc, argv);
 }

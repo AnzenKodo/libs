@@ -7,6 +7,11 @@
  *  - http://www.cse.yorku.ca/~oz/hash.html
  *  - https://burtleburtle.net/bob/hash/integer.html
  * -----------------------------------------------------------------------------
+ * TODO: Add more hash functions
+ *   - https://en.wikipedia.org/wiki/List_of_hash_functions
+ *   - https://en.wikipedia.org/wiki/Comparison_of_cryptographic_hash_functions
+ *   - https://en.wikipedia.org/wiki/NIST_hash_function_competition#cite_note-71
+ * -----------------------------------------------------------------------------
  * MIT License
  *
  * Copyright 2024 AnzenKodo
